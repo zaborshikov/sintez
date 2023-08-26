@@ -31,10 +31,9 @@ class Video():
             ret, frame = cap.read()
             if n != -1:
                 self.set_frame(current_frame + 1)
-            return [True, frame]
-        return [False, None]
-        
-    
+            return frame
+        return None
+
     
     def set_frame(self, n):
         self.cap.set(cv2.CAP_PROP_POS_FRAMES, n)
@@ -54,8 +53,9 @@ class Video():
         self.set_frame(startframe)
         frames = []
         frame = self.read_frame()
-        
-        while frame[0]:
+
+        # while frame[0] is not None:
+        while frame is not None:
             if self.current_frame_number() == self.length:
                 break
             frames.append(frame)
