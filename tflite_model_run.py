@@ -185,8 +185,20 @@ try:
     points2 = find_landmarks(landmarker, frames[y_pred[3]])
 except:
     points2 = find_landmarks(landmarker, frames[-1])
-dist = head_movement(points1, points2)
-if dist > 70:
-    print(f'Detected head movement by {dist:.2f} pixels')
-else:
-    print(f'Head movement not detected, {dist:.2f} pixels')
+try:
+    dist = head_movement(points1, points2)
+    if dist > 70:
+        print(f'Found mistake: head movement by {dist:.2f} pixels')
+    else:
+        print(f'Head movement not detected')
+except:
+    points1 = find_landmarks(landmarker, frames[0])
+    points2 = find_landmarks(landmarker, frames[len(frames) // 4])
+    try:
+        dist = head_movement(points1, points2)
+        if dist > 70:
+            print(f'Found mistake: head movement by {dist:.2f} pixels')
+        else:
+            print(f'Head movement not detected')
+    except:
+        print('Error detecting person')
