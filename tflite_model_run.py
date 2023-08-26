@@ -9,6 +9,8 @@ import gc
 
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 
 
 class Video():
