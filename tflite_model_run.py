@@ -176,6 +176,15 @@ def head_movement(points1, points2, thresh=50):
     return dist
 
 
+def angle(points1, thresh=35):
+    x1, y1 = points1.pose_landmarks[0][23].x, points1.pose_landmarks[0][23].y
+    x2, y2 = points1.pose_landmarks[0][24].x, points1.pose_landmarks[0][24].y
+    dist = (((x1 - x2) * 1920) ** 2 + ((y1 - y2) * 1080) ** 2) ** 0.5
+    if dist > thresh:
+        return 'Face On'
+    return 'Down the Line'
+
+
 pose_clf = get_pose_clf('<path_to_tflite_model>.tflite')
 y_pred, frames = pose_mean_algo(pose_clf, '<path_to_video>')
 print('Predicted phase changes:', y_pred)
@@ -202,3 +211,4 @@ except:
             print(f'Head movement not detected')
     except:
         print('Error detecting person')
+print('Angle:', angle(points1))
