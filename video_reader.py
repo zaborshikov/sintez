@@ -30,7 +30,7 @@ class Video():
         if cap.isOpened():
             if return_mode == 'RGB':
                 ret, frame = cap.read()
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             if n != -1:
                 self.set_frame(current_frame + 1)
             return frame
