@@ -180,9 +180,13 @@ pose_clf = get_pose_clf('<path_to_tflite_model>.tflite')
 y_pred, frames = pose_mean_algo(pose_clf, '<path_to_video>')
 print('Predicted phase changes:', y_pred)
 
-landmarker = get_landmarker('<path_to_task_pose_model>.task')
 points1 = find_landmarks(landmarker, frames[y_pred[0]])
-points2 = find_landmarks(landmarker, frames[y_pred[3]])
+try:
+    points2 = find_landmarks(landmarker, frames[y_pred[3]])
+except:
+    points2 = find_landmarks(landmarker, frames[-1])
 dist = head_movement(points1, points2)
-if dist > 50:
-    print(f'Detected head movement by {dist} pixels')
+if dist > 10:
+    print(f'Detected head movement by {dist:.2f} pixels')
+else:
+    print(f'Head movement not detected, {dist:.2f} pixels')
