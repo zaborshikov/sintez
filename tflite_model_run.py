@@ -122,7 +122,7 @@ def pose_mean_algo(model, video_path):
                     ids.append(ids[i - 1] + 2)
     gc.collect()
 
-    return ids
+    return ids, frames
 
 
 def get_pose_clf(pose_model_path):
@@ -133,7 +133,56 @@ def get_pose_clf(pose_model_path):
     return pose_clf
 
 
-pose_model_path = '<path_to_tflite_model>'
-pose_clf = get_pose_clf(pose_model_path)
-y_pred = pose_mean_algo(pose_clf, '<path_to_video>')
-print(y_pred)
+def get_landmarker(model_path):
+    BaseOptions = mp.tasks.BaseOptions
+    PoseLandmarker = mp.tasks.vision.PoseLandmarker
+    PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
+    VisionRunningMode = mp.tasks.vision.RunningMode
+    options = PoseLandmarkerOptions(
+        base_options=BaseOptions(model_asset_path=model_path),
+        running_mode=VisionRunningMode.IMAGE
+    )
+    return PoseLandmarker.create_from_options(options)
+
+
+def find_landmarks(landmarker, numpy_image):
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=numpy_image)
+    pose_landmarker_result = landmarker.detect(mp_image)
+    return pose_landmarker_result
+
+
+def draw_landmarks_on_image(rgb_image, detection_result):
+    pose_landmarks_list = detection_result.pose_landmarks
+    annotated_image = np.copy(rgb_image)
+    for idx in range(len(pose_landmarks_list)):
+        pose_landmarks = pose_landmarks_list[idx]
+        pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+        pose_landmarks_proto.landmark.extend([
+            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
+        ])
+        solutions.drawing_utils.draw_landmarks(
+            annotated_image,
+            pose_landmarks_proto,
+            mp.solutions.pose.POSE_CONNECTIONS,
+            mp.solutions.drawing_utils.DrawingSpec(color=(245,117,66), thickness=5, circle_radius=7),
+            mp.solutions.drawing_utils.DrawingSpec(color=(245,66,230), thickness=5, circle_radius=7))
+    return annotated_image
+
+
+def head_movement(points1, points2, thresh=50):
+    x1, y1 = points1.pose_landmarks[0][1].x, points1.pose_landmarks[0][1].y
+    x2, y2 = points2.pose_landmarks[0][1].x, points2.pose_landmarks[0][1].y
+    dist = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+    return dist
+
+
+pose_clf = get_pose_clf('<path_to_tflite_model>.tflite')
+y_pred, frames = pose_mean_algo(pose_clf, '<path_to_video>')
+print('Predicted phase changes:', y_pred)
+
+landmarker = get_landmarker('<path_to_task_pose_model>.task')
+points1 = find_landmarks(landmarker, frames[y_pred[0]])
+points2 = find_landmarks(landmarker, frames[y_pred[3]])
+dist = head_movement(points1, points2)
+if dist > 50:
+    print(f'Detected head movement by {dist} pixels')
