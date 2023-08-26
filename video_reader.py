@@ -19,7 +19,7 @@ class Video():
             self.cap = cap
     
     
-    def read_frame(self, n=-1):
+    def read_frame(self, n=-1, return_mode='BGR'):
         current_frame = self.current_frame_number()
         if n != -1:
             self.set_frame(n)
@@ -28,7 +28,9 @@ class Video():
         self.readed = True
 
         if cap.isOpened():
-            ret, frame = cap.read()
+            if return_mode == 'RGB':
+                ret, frame = cap.read()
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             if n != -1:
                 self.set_frame(current_frame + 1)
             return frame
@@ -43,7 +45,7 @@ class Video():
         return self.cap.get(cv2.CAP_PROP_POS_FRAMES)
     
     
-    def return_list(self, n=-1):
+    def return_list(self, n=-1, return_mode='BGR'):
         current_frame = self.current_frame_number()
         startframe = 0
         
@@ -59,7 +61,7 @@ class Video():
             if self.current_frame_number() == self.length:
                 break
             frames.append(frame)
-            frame = self.read_frame()
+            frame = self.read_frame(return_mode=return_mode)
         
         self.set_frame(current_frame)
         
