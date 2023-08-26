@@ -186,7 +186,7 @@ try:
 except:
     points2 = find_landmarks(landmarker, frames[-1])
 dist = head_movement(points1, points2)
-if dist > 10:
+if dist > 70:
     print(f'Detected head movement by {dist:.2f} pixels')
 else:
     print(f'Head movement not detected, {dist:.2f} pixels')
