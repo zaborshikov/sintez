@@ -14,4 +14,14 @@ def acc_pose(model, df, data_path):
         y_pred = pose_mean_algo(model, data_path + row[0])
         corr += sum([abs(t - p) <= 60 for t, p in zip(y_true, y_pred)])
     return corr / total
-  
+
+
+def make_submission(model, submit_path, video_path):
+    sample = pd.read_csv(submit_path, sep=';')
+    for i in sample.index.tolist():
+        row = sample.iloc[i]
+        pred = pose_mean_algo(model, video_path + row[0])
+        sample.iloc[i, 1:] = pred
+    sample.to_csv('fmprojects.csv')
+    return sample
+    
