@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import shutil
 import gc
 
-from mediapipe_model_maker import image_classifier
-from mediapipe_model_maker import object_detector
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
