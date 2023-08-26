@@ -172,7 +172,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 def head_movement(points1, points2, thresh=50):
     x1, y1 = points1.pose_landmarks[0][1].x, points1.pose_landmarks[0][1].y
     x2, y2 = points2.pose_landmarks[0][1].x, points2.pose_landmarks[0][1].y
-    dist = ((x1 - x2) ** 2 * 1920 + (y1 - y2) ** 2 * 1080) ** 0.5
+    dist = (((x1 - x2) * 1920) ** 2 + ((y1 - y2) * 1080) ** 2) ** 0.5
     return dist
 
 
