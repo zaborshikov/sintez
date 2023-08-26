@@ -3,7 +3,7 @@ from tqdm import tqdm
 from pose_pred_algorithms import pose_mean_algo
 
 
-pose_data = pd.read_excel('/content/positions_markup_train.xlsx')
+pose_data = pd.read_excel('/content/positions_markup_train.xlsx', sep=';')
 pose_data = pose_data[pose_data['P1'] != '-'].reset_index(drop=True)
 
 def acc_pose(model, df, data_path):
